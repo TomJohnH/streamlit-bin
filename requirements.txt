@@ -1,3 +1,4 @@
 plotly.express
 pandas
 seaborn==0.12.2
+optbinning==0.17.3
