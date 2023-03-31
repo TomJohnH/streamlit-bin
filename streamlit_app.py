@@ -33,12 +33,52 @@ if uploaded_file is not None:
 
     # https://gnpalencia.org/optbinning/tutorials/tutorial_continuous.html
 
-    tab0, tab1, tab2, tab3 = st.tabs(["Histograms", "Binning", "Correlations", "GLM"])
+    tab0, tab1, tab2, tab3 = st.tabs(
+        ["Histograms", "Continous binning", "Correlations", "GLM"]
+    )
 
     df = pd.read_csv(uploaded_file)
 
     # Select only numerical columns
     cols_names = df.columns.tolist()
+
+    with tab0:
+
+        st.subheader("Histogram")
+        selected_column = st.selectbox("Select a column:", options=cols_names)
+
+        dtype = df[selected_column].dtype
+
+        if dtype != "object":
+
+            # Define min and max ages
+            min_var = int(df[selected_column].min())
+            max_var = int(df[selected_column].max())
+
+            # Add slider
+            var_range = st.slider(
+                "Select age range", min_var, max_var, (min_var, max_var)
+            )
+
+            # Filter DataFrame
+            filtered_df = df[
+                (df[selected_column] >= var_range[0])
+                & (df[selected_column] <= var_range[1])
+            ]
+
+        # Create histogram
+        if dtype == "object":
+            fig = px.histogram(df, x=selected_column)
+        else:
+            fig = px.histogram(filtered_df, x=selected_column)
+
+        # Show plot
+        st.plotly_chart(fig, use_container_width=True)
+        st.subheader("Unique rows")
+        # show head
+        st.write("Unique rows")
+
+        st.write(df[selected_column].drop_duplicates())
 
     with tab1:
         # Select column to bin
@@ -61,17 +101,6 @@ if uploaded_file is not None:
             fig = binning_table.plot()
             st.pyplot(fig)
     # col1, col2 = st.columns(2)
-
-    with tab0:
-        selected_column = st.selectbox("Select a column:", options=cols_names)
-
-        st.write(df[selected_column].head(5))
-
-        # Create histogram
-        fig = px.histogram(df, x=selected_column)
-
-        # Show plot
-        st.plotly_chart(fig, use_container_width=True)
 
     with tab2:
         # Calculate the correlation matrix
