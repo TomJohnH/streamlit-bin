@@ -10,6 +10,14 @@ from optbinning import OptimalBinning
 from optbinning import ContinuousOptimalBinning
 
 st.set_option("deprecation.showPyplotGlobalUse", False)
+
+
+@st.cache_data
+def convert_df(df):
+    # IMPORTANT: Cache the conversion to prevent computation on every rerun
+    return df.to_csv(index=False).encode("utf-8")
+
+
 # -------------------------
 #
 #       INTRO
@@ -80,6 +88,15 @@ if uploaded_file is not None:
 
         st.write(df[selected_column].drop_duplicates())
 
+        csv = convert_df(df[selected_column].drop_duplicates())
+
+        st.download_button(
+            label="Download data as CSV",
+            data=csv,
+            file_name=f"unique_df_{selected_column}.csv",
+            mime="text/csv",
+        )
+
     with tab1:
         # Select column to bin
         numerical_cols = df.select_dtypes(include=["float", "int"]).columns.tolist()
@@ -90,16 +107,50 @@ if uploaded_file is not None:
 
         # Perform optimal binning
         if st.button("Perform Optimal Binning"):
+
             optb = ContinuousOptimalBinning(name=selected_column, dtype="numerical")
             optb.fit(df[selected_column], df[target_column])
-            st.write("Splits")
+            st.subheader("Splits")
             st.write(optb.splits)
-            st.write("Binning table")
+            st.subheader("Binning table")
             binning_table = optb.binning_table
             st.write(optb.binning_table.build())
             fig, ax = plt.subplots()
             fig = binning_table.plot()
+            st.subheader("Binning chart")
             st.pyplot(fig)
+
+            # Get bin edges
+            bin_edges = optb.splits
+
+            # Convert bin edges into bin indices using numpy.digitize
+            bin_indices = np.digitize(df[selected_column], bins=bin_edges)
+
+            # Create a new column with binned values (bin indices)
+            df["binned_indices_" + selected_column] = bin_indices
+
+            # Get the binning table and extract bin intervals
+            binning_table_df = binning_table.build()
+            bin_intervals = binning_table_df["Bin"].tolist()
+
+            bin_index_to_name = {i: bin_intervals[i] for i in range(len(bin_intervals))}
+
+            # Create custom bin names based on intervals
+            df["binned_names_" + selected_column] = df[
+                "binned_indices_" + selected_column
+            ].map(bin_index_to_name)
+            st.subheader("Binned data")
+            st.write(df)
+
+            csv = convert_df(df)
+
+            st.download_button(
+                label="Download data as CSV",
+                data=csv,
+                file_name=f"binned_df_{selected_column}.csv",
+                mime="text/csv",
+            )
+
     # col1, col2 = st.columns(2)
 
     with tab2:
