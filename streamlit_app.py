@@ -6,9 +6,9 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
 from optbinning import OptimalBinning
-
 from optbinning import ContinuousOptimalBinning
 
+# turn off graphs warnings
 st.set_option("deprecation.showPyplotGlobalUse", False)
 
 
@@ -26,40 +26,44 @@ def convert_df(df):
 
 st.title("Binning tool")
 
-# allow user to upload a CSV file containing stock data
+# Allow user to upload a CSV file containg the data
 uploaded_file = st.file_uploader(
     "Upload data *.csv",
     type=["csv"],
     help="Upload data",
 )
 
-# allow user to play around with the app without uploading the file
+# Allow user to play around with the app without uploading the file
 if st.checkbox("Use example file"):
     uploaded_file = "data.csv"
 
 if uploaded_file is not None:
 
-    # https://gnpalencia.org/optbinning/tutorials/tutorial_continuous.html
-
+    # Split tool to tabs
     tab0, tab1, tab2, tab3 = st.tabs(
         ["Histograms", "Continous binning", "Correlations", "GLM"]
     )
 
+    # Read dataframe
     df = pd.read_csv(uploaded_file)
 
-    # Select only numerical columns
+    # Select columnsnames
     cols_names = df.columns.tolist()
 
     with tab0:
 
         st.subheader("Histogram")
+
+        # Allow user to select column for the histogram
         selected_column = st.selectbox("Select a column:", options=cols_names)
 
+        # Check column type
         dtype = df[selected_column].dtype
 
+        # Display slider only if the column is numercial
         if dtype != "object":
 
-            # Define min and max ages
+            # Define min and max variable values
             min_var = int(df[selected_column].min())
             max_var = int(df[selected_column].max())
 
@@ -82,12 +86,15 @@ if uploaded_file is not None:
 
         # Show plot
         st.plotly_chart(fig, use_container_width=True)
+
+        # Create table with unqie rows
         st.subheader("Unique rows")
         # show head
         st.write("Unique rows")
 
         st.write(df[selected_column].drop_duplicates())
 
+        # Allow user to download unique column values
         csv = convert_df(df[selected_column].drop_duplicates())
 
         st.download_button(
@@ -98,6 +105,12 @@ if uploaded_file is not None:
         )
 
     with tab1:
+
+        # Binning can be extremaly important for modelling
+        # this section of the tool aims to simplify binning process
+
+        # https://gnpalencia.org/optbinning/tutorials/tutorial_continuous.html
+
         # Select column to bin
         numerical_cols = df.select_dtypes(include=["float", "int"]).columns.tolist()
         selected_column = st.selectbox("Select column to bin", numerical_cols)
