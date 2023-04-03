@@ -113,21 +113,27 @@ if uploaded_file is not None:
 
         # Select column to bin
         numerical_cols = df.select_dtypes(include=["float", "int"]).columns.tolist()
-        selected_column = st.selectbox("Select column to bin", numerical_cols)
+        selected_column = st.selectbox("Select column to bin:", numerical_cols)
 
         # Get the target column
-        target_column = st.selectbox("Select target column", numerical_cols)
+        target_column = st.selectbox("Bin based on target:", numerical_cols)
 
         # Perform optimal binning
-        if st.button("Perform Optimal Binning"):
+        if st.button("Perform Optimal Continous Binning"):
 
             optb = ContinuousOptimalBinning(name=selected_column, dtype="numerical")
             optb.fit(df[selected_column], df[target_column])
+
+            # Show splits
             st.subheader("Splits")
             st.write(optb.splits)
+
+            # Show binning table
             st.subheader("Binning table")
             binning_table = optb.binning_table
             st.write(optb.binning_table.build())
+
+            # Show binning charts
             fig, ax = plt.subplots()
             fig = binning_table.plot()
             st.subheader("Binning chart")
@@ -155,6 +161,7 @@ if uploaded_file is not None:
             st.subheader("Binned data")
             st.write(df)
 
+            # Download file
             csv = convert_df(df)
 
             st.download_button(
@@ -163,8 +170,6 @@ if uploaded_file is not None:
                 file_name=f"binned_df_{selected_column}.csv",
                 mime="text/csv",
             )
-
-    # col1, col2 = st.columns(2)
 
     with tab2:
         # Calculate the correlation matrix
