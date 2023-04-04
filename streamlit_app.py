@@ -110,7 +110,21 @@ if uploaded_file is not None:
         # this section of the tool aims to simplify binning process
 
         # https://gnpalencia.org/optbinning/tutorials/tutorial_continuous.html
+        with st.expander("Intro to optimal binning with continuous target"):
+            st.write(
+                """Optimal binning, also known as supervised discretization, is a technique used in the preprocessing stage of machine learning, particularly for classification and regression problems. It involves converting continuous features into discrete intervals or bins, while taking into consideration the relationship between the features and a continuous target variable. The goal is to maximize the information value or predictive power of the binned features.
+                
+The optbinning package in Python is a popular library for optimal binning. When working with a continuous target variable, the library provides the ContinuousOptimalBinning class to perform the optimal binning process.
 
+The main goal of the optimal binning algorithm with continuous target variables is to maximize the relationship between the binned feature and the target variable. For continuous targets, the algorithm typically aims to maximize the homogeneity within the bins concerning the target variable. In this context, homogeneity means that the values within each bin are as similar as possible.
+
+One common approach to achieve this is by minimizing the within-bin variance or sum of squared differences between the target variable and the mean value of the target variable within each bin. This can be seen as a variation of the decision tree algorithm, where the method tries to find the best split points in the feature space to create the most homogeneous bins.
+           
+            """
+            )
+            st.write(
+                "https://gnpalencia.org/optbinning/tutorials/tutorial_continuous.html"
+            )
         # Select column to bin
         numerical_cols = df.select_dtypes(include=["float", "int"]).columns.tolist()
         selected_column = st.selectbox("Select column to bin:", numerical_cols)
