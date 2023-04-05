@@ -198,20 +198,18 @@ One common approach to achieve this is by minimizing the within-bin variance or 
 
         numerical_cols = df.select_dtypes(include=["float", "int"]).columns.tolist()
         # Add multiselect widget
-        response = st.multiselect(
+        response = st.selectbox(
             "Response variable",
             numerical_cols,
-            max_selections=1,
         )
 
-        explanatory = st.multiselect(
+        explanatory = st.selectbox(
             "Explanatory variable",
             cols_names,
-            max_selections=1,
         )
-        if response and explanatory:
+        if response and explanatory and response != explanatory:
 
-            df_model = df[[response[0], explanatory[0]]]
+            df_model = df[[response, explanatory]]
 
             # null records
             st.write("Removed null records")
@@ -220,38 +218,38 @@ One common approach to achieve this is by minimizing the within-bin variance or 
             df_model = df_model.dropna()
             df_model_inital = df_model
 
-            dtype = df_model[explanatory[0]].dtype
+            dtype = df_model[explanatory].dtype
 
             if dtype == "object":
-                st.write(f"{explanatory[0]} is of string data type.")
+                st.write(f"{explanatory} is of string data type.")
                 # Create dummy variables for the 'x1' categorical variable
                 dummies = pd.get_dummies(
-                    df_model[explanatory[0]], prefix=explanatory[0], drop_first=True
+                    df_model[explanatory], prefix=explanatory, drop_first=True
                 )
                 df_model = pd.concat([df_model, dummies], axis=1)
-                data = df_model.drop(explanatory[0], axis=1)
+                data = df_model.drop(explanatory, axis=1)
                 explanatory_with_constant = sm.add_constant(
-                    df_model.drop([response[0], explanatory[0]], axis=1)
+                    df_model.drop([response, explanatory], axis=1)
                 )
             elif pd.api.types.is_categorical_dtype(dtype):
-                st.write(f"{explanatory[0]} is of categorical data type.")
+                st.write(f"{explanatory} is of categorical data type.")
                 dummies = pd.get_dummies(
-                    df_model[explanatory[0]], prefix=explanatory[0], drop_first=True
+                    df_model[explanatory], prefix=explanatory, drop_first=True
                 )
                 df_model = pd.concat([df_model, dummies], axis=1)
-                data = df_model.drop(explanatory[0], axis=1)
+                data = df_model.drop(explanatory, axis=1)
                 explanatory_with_constant = sm.add_constant(
-                    df_model.drop([response[0], explanatory[0]], axis=1)
+                    df_model.drop([response, explanatory], axis=1)
                 )
             else:
-                st.write(f"{explanatory[0]} is of other data type.")
-                explanatory_with_constant = sm.add_constant(df_model[explanatory[0]])
+                st.write(f"{explanatory} is of other data type.")
+                explanatory_with_constant = sm.add_constant(df_model[explanatory])
 
             # without null records
             st.write("Simple GLM")
 
             model = sm.GLM(
-                df_model[response[0]],
+                df_model[response],
                 explanatory_with_constant,
                 family=sm.families.Gaussian(),
             ).fit()
@@ -259,6 +257,6 @@ One common approach to achieve this is by minimizing the within-bin variance or 
             st.write(model.summary())
             fig, ax = plt.subplots()
             y_pred = model.predict(explanatory_with_constant)
-            ax.scatter(df_model[explanatory[0]], df_model[response[0]], color="blue")
-            ax.plot(df_model[explanatory[0]], y_pred, color="red", linewidth=2)
+            ax.scatter(df_model[explanatory], df_model[response], color="blue")
+            ax.plot(df_model[explanatory], y_pred, color="red", linewidth=2)
             st.pyplot(fig)
