@@ -5,6 +5,7 @@ import plotly.express as px
 import seaborn as sns
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
+from pygam import LinearGAM, s
 from optbinning import OptimalBinning
 from optbinning import ContinuousOptimalBinning
 
@@ -260,3 +261,20 @@ One common approach to achieve this is by minimizing the within-bin variance or 
             ax.scatter(df_model[explanatory], df_model[response], color="blue")
             ax.plot(df_model[explanatory], y_pred, color="red", linewidth=2)
             st.pyplot(fig)
+
+            # GAM MODELS
+            # Fit the GAM model
+            if df_model[explanatory].dtype != "object" and df_model[response].dtype != "object":
+                st.write("Gam models")
+                gam = LinearGAM(n_splines=10).fit(df_model[explanatory], df_model[response])
+                
+                
+                st.write(gam.summary())
+
+                y_pred = gam.predict(df_model[explanatory])
+
+                fig, ax = plt.subplots()
+                ax.scatter(df_model[explanatory], df_model[response], color="blue")
+                ax.plot(df_model[explanatory], y_pred, color="red", linewidth=2)
+                st.pyplot(fig)
+
