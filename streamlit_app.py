@@ -247,7 +247,7 @@ One common approach to achieve this is by minimizing the within-bin variance or 
                 explanatory_with_constant = sm.add_constant(df_model[explanatory])
 
             # without null records
-            st.write("Simple GLM")
+            st.subheader("Simple GLM")
 
             model = sm.GLM(
                 df_model[response],
@@ -262,19 +262,55 @@ One common approach to achieve this is by minimizing the within-bin variance or 
             ax.plot(df_model[explanatory], y_pred, color="red", linewidth=2)
             st.pyplot(fig)
 
+            df_chart = pd.DataFrame({'actual': df_model[response], 'predicted': y_pred})
+
+            # Create a scatter plot
+            fig, ax = plt.subplots()
+            ax.scatter(df_chart.index, df_chart['actual'], label='Actual', color='b', alpha=0.7)
+            ax.scatter(df_chart.index, df_chart['predicted'], label='Predicted', color='r', alpha=0.7)
+
+            # Configure plot appearance
+            ax.set_title('Actual vs Predicted')
+            ax.set_xlabel('Index')
+            ax.set_ylabel('Value')
+            ax.legend()
+
+            # Display the plot in Streamlit
+            st.pyplot(fig)
+
+
+
             # GAM MODELS
             # Fit the GAM model
             if df_model[explanatory].dtype != "object" and df_model[response].dtype != "object":
-                st.write("Gam models")
+                st.subheader("Simple GAM")
                 gam = LinearGAM(n_splines=10).fit(df_model[explanatory], df_model[response])
                 
                 
-                st.write(gam.summary())
+                # st.write(gam.summary())
 
                 y_pred = gam.predict(df_model[explanatory])
 
                 fig, ax = plt.subplots()
                 ax.scatter(df_model[explanatory], df_model[response], color="blue")
                 ax.plot(df_model[explanatory], y_pred, color="red", linewidth=2)
+                st.pyplot(fig)
+
+
+
+                df_chart = pd.DataFrame({'actual': df_model[response], 'predicted': y_pred})
+
+                # Create a scatter plot
+                fig, ax = plt.subplots()
+                ax.scatter(df_chart.index, df_chart['actual'], label='Actual', color='b', alpha=0.7)
+                ax.scatter(df_chart.index, df_chart['predicted'], label='Predicted', color='r', alpha=0.7)
+
+                # Configure plot appearance
+                ax.set_title('Actual vs Predicted')
+                ax.set_xlabel('Index')
+                ax.set_ylabel('Value')
+                ax.legend()
+
+                # Display the plot in Streamlit
                 st.pyplot(fig)
 
