@@ -286,15 +286,21 @@ One common approach to achieve this is by minimizing the within-bin variance or 
                 st.subheader("Simple GAM")
                 gam = LinearGAM(n_splines=10).fit(df_model[explanatory], df_model[response])
                 
-                
+                # print(gam.summary())
                 # st.write(gam.summary())
 
                 y_pred = gam.predict(df_model[explanatory])
+                st.write("Predictions")
+                df_test = pd.DataFrame({explanatory:df_model[explanatory], response:y_pred}).drop_duplicates()
+                st.write(df_test)
 
                 fig, ax = plt.subplots()
                 ax.scatter(df_model[explanatory], df_model[response], color="blue")
-                ax.plot(df_model[explanatory], y_pred, color="red", linewidth=2)
+                df_test = df_test.sort_values(by=explanatory)
+                ax.plot(df_test[explanatory], df_test[response], color="red", linewidth=2, marker='o')
+            
                 st.pyplot(fig)
+
 
 
 
