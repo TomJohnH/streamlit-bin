@@ -8,8 +8,8 @@ import statsmodels.api as sm
 from pygam import LinearGAM, s
 from optbinning import OptimalBinning
 from optbinning import ContinuousOptimalBinning
-from streamlit_pandas_profiling import st_profile_report
-import pandas_profiling
+# from streamlit_pandas_profiling import st_profile_report
+# import pandas_profiling
 
 # turn off graphs warnings
 st.set_option("deprecation.showPyplotGlobalUse", False)
@@ -323,7 +323,7 @@ One common approach to achieve this is by minimizing the within-bin variance or 
                 st.pyplot(fig)
 
     with tab4:
-        if st.button("Run data profile"):
+        # if st.button("Run data profile"):
 
-            pr = df_profiling.profile_report()
-            st_profile_report(pr)
+        #     pr = df_profiling.profile_report()
+        #     st_profile_report(pr)
