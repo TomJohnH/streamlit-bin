@@ -3,5 +3,5 @@ pandas==1.5.3
 seaborn==0.12.2
 optbinning==0.17.3
 pygam
-pandas_profiling
+pandas_profiling==3.6.6
 streamlit_pandas_profiling==0.1.3
