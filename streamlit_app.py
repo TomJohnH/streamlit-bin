@@ -323,6 +323,7 @@ One common approach to achieve this is by minimizing the within-bin variance or 
                 st.pyplot(fig)
 
     with tab4:
+        pass
         # if st.button("Run data profile"):
 
         #     pr = df_profiling.profile_report()
