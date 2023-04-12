@@ -8,6 +8,8 @@ import statsmodels.api as sm
 from pygam import LinearGAM, s
 from optbinning import OptimalBinning
 from optbinning import ContinuousOptimalBinning
+from streamlit_pandas_profiling import st_profile_report
+import pandas_profiling
 
 # turn off graphs warnings
 st.set_option("deprecation.showPyplotGlobalUse", False)
@@ -41,13 +43,13 @@ if st.checkbox("Use example file"):
 if uploaded_file is not None:
 
     # Split tool to tabs
-    tab0, tab1, tab2, tab3 = st.tabs(
-        ["Histograms", "Continous binning", "Correlations", "GLM"]
+    tab0, tab1, tab2, tab3, tab4 = st.tabs(
+        ["Histograms", "Continous binning", "Correlations", "GLM","Pandas profiler"]
     )
 
     # Read dataframe
     df = pd.read_csv(uploaded_file)
-
+    df_profiling = df
     # Select columnsnames
     cols_names = df.columns.tolist()
 
@@ -320,3 +322,8 @@ One common approach to achieve this is by minimizing the within-bin variance or 
                 # Display the plot in Streamlit
                 st.pyplot(fig)
 
+    with tab4:
+        if st.button("Run data profile"):
+
+            pr = df_profiling.profile_report()
+            st_profile_report(pr)
