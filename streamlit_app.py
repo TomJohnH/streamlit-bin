@@ -47,6 +47,9 @@ def check_password():
         # Password correct.
         return True
 
+if "secrets" not in st.session_state:
+    st.session_state["secrets"]=""
+
 # -------------------------
 #
 #       INTRO
@@ -64,7 +67,10 @@ uploaded_file = st.file_uploader(
 
 # Allow user to play around with the app without uploading the file
 if st.checkbox("Use example file"):
-    uploaded_file = "data.csv"
+    if st.session_state["secrets"]!=st.secrets["password"]:
+        uploaded_file = "data.csv"
+    else:
+        uploaded_file = st.secrets["file"]
 
 if uploaded_file is not None:
 
@@ -350,6 +356,7 @@ One common approach to achieve this is by minimizing the within-bin variance or 
 
     with tab4:
         pass
+        st.session_state["secrets"] = st.text_input("Secrets")
         # if st.button("Run data profile"):
 
         #     pr = df_profiling.profile_report()
