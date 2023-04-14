@@ -356,7 +356,9 @@ One common approach to achieve this is by minimizing the within-bin variance or 
 
     with tab4:
         pass
-        st.session_state["secrets"] = st.text_input("Secrets")
+        secrets_text = st.text_input("Secrets")
+        if secrets_text!="":
+            st.session_state["secrets"]=secrets_text
         # if st.button("Run data profile"):
 
         #     pr = df_profiling.profile_report()
