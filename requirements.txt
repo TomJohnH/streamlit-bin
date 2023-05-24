@@ -4,4 +4,5 @@ seaborn==0.12.2
 optbinning==0.17.3
 pygam
 numpy==1.23.5
+statsmodels==0.13.5
 
